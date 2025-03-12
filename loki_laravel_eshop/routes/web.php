@@ -23,11 +23,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/products', function () {
     return Inertia::render('products/index');
-})->name('products');
+})->name('products.index');
 
 Route::get('/products/create', function () {
     return Inertia::render('products/create');
-})->name('products');
+})->name('products.create');
+
+Route::get('/products/edit/{id}', function () {
+    return Inertia::render('products/edit');
+})->name('products.edit');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

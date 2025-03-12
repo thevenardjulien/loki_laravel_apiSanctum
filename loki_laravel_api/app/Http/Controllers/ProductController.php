@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -14,18 +15,14 @@ class ProductController extends Controller
      */
     public function index()
     {
-
-        // $products = Product::all();
-        // $products->transform(function ($product) {
-        // if($product->image) {
-        // $product->image_url = url('storage/' . $product->image);
-        // }
-        // return $product;
-        // });
-        // return response()->json($products);
-
         $products = Product::orderBy('updated_at', 'desc')->get();
-        return response()->json($products, 200);
+        $products->transform(function ($product) {
+            if ($product->image) {
+                $product->image_url = url('storage/' . $product->image);
+            }
+            return $product;
+        });
+        return response()->json($products);
     }
 
     /**
@@ -81,7 +78,18 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json([
+                'message' => 'Product not found',
+            ], 404);
+        }
+
+        if ($product->image) {
+            $product->image_url = url('storage/' . $product->image);
+        }
+
+        return response()->json($product, 200);
     }
 
     /**
@@ -105,6 +113,24 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json([
+                'message' => 'Product not found',
+            ], 404);
+        }
+
+        if ($product->image) {
+            $imagePath = 'public/' . $product->image;
+            if (Storage::exists($imagePath)) {
+                Storage::delete($imagePath);
+            }
+        }
+
+        $product->delete();
+
+        return response()->json([
+            'message' => 'Product deleted successfully',
+        ], 200);
     }
 }

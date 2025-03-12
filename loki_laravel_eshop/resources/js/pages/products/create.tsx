@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { fetchCreateProducts } from '@/fetch/products';
+import { router } from "@inertiajs/react";
 
 export default function CreateProduct() {
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -23,6 +24,7 @@ export default function CreateProduct() {
         if (token) {
             const response = await fetchCreateProducts(formData, token);
             console.log(response);
+            router.visit('/products');
         }
     };
 
